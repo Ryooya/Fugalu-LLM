@@ -1,9 +1,24 @@
+import time
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model_path = "Fugaku-LLM/Fugaku-LLM-13B-instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_path)
-model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=torch.bfloat16, device_map="auto")
+start = time.time()
+
+MODEL_SAVE_DIR = "model_save"
+
+model_name = "Fugaku-LLM/Fugaku-LLM-13B-instruct"
+
+tokenizer = AutoTokenizer.from_pretrained(
+    model_name,
+    cache_dir=MODEL_SAVE_DIR)
+
+model = AutoModelForCausalLM.from_pretrained(
+    model_name, 
+    torch_dtype=torch.bfloat16,
+    device_map="auto",
+    cache_dir=MODEL_SAVE_DIR
+    )
+
 model.eval()
 
 system_example = "以下は、タスクを説明する指示です。要求を適切に満たす応答を書きなさい。"
@@ -25,3 +40,4 @@ tokens = model.generate(
 )
 out = tokenizer.decode(tokens[0], skip_special_tokens=True)
 print(out)
+print("経過時間:", time.time() - start)
